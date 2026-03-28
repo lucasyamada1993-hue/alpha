@@ -1,0 +1,38 @@
+{
+  "name": "GestorPerfil",
+  "type": "object",
+  "properties": {
+    "login": {
+      "type": "string",
+      "description": "Login \u00fanico do gerente"
+    },
+    "senha": {
+      "type": "string",
+      "description": "Senha do gerente"
+    },
+    "funcoes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Gerente Enfermagem",
+          "Gerente Administrativo",
+          "Gerente de Treinamentos/RH",
+          "Gerente Equipamentos",
+          "Gerente Qualidade"
+        ]
+      },
+      "description": "Fun\u00e7\u00f5es atribu\u00eddas ao perfil"
+    },
+    "ativo": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se o perfil est\u00e1 ativo"
+    }
+  },
+  "required": [
+    "login",
+    "senha",
+    "funcoes"
+  ]
+}

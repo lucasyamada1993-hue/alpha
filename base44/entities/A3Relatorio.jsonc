@@ -1,0 +1,260 @@
+{
+  "name": "A3Relatorio",
+  "type": "object",
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "description": "T\u00edtulo do problema / oportunidade de melhoria"
+    },
+    "dono": {
+      "type": "string",
+      "description": "Nome do respons\u00e1vel pelo A3"
+    },
+    "prioridade": {
+      "type": "string",
+      "enum": [
+        "Alta",
+        "M\u00e9dia",
+        "Baixa"
+      ],
+      "default": "Alta"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "N\u00e3o Conformidade",
+        "Oportunidade de Melhoria",
+        "Evento Adverso",
+        "Near Miss"
+      ],
+      "default": "N\u00e3o Conformidade"
+    },
+    "status_pdca": {
+      "type": "string",
+      "enum": [
+        "PLAN",
+        "DO",
+        "CHECK",
+        "ACT",
+        "Conclu\u00eddo"
+      ],
+      "default": "PLAN"
+    },
+    "pop_referencia": {
+      "type": "string",
+      "description": "C\u00f3digo do POP relacionado (ex: POP-TC-001)"
+    },
+    "origem": {
+      "type": "string",
+      "description": "De onde veio este A3 (ex: Auditoria, Evento Adverso, Sugest\u00e3o)"
+    },
+    "plan_contexto": {
+      "type": "string",
+      "description": "Contexto e hist\u00f3rico do problema"
+    },
+    "plan_condicao_atual": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o objetiva da situa\u00e7\u00e3o atual com dados"
+    },
+    "plan_meta": {
+      "type": "string",
+      "description": "Meta / Condi\u00e7\u00e3o Alvo a ser atingida"
+    },
+    "plan_causa_raiz": {
+      "type": "string",
+      "description": "Causa raiz consolidada ap\u00f3s an\u00e1lise"
+    },
+    "plan_ishikawa": {
+      "type": "object",
+      "description": "Diagrama de Ishikawa \u2014 causas por categoria",
+      "properties": {
+        "mao_de_obra": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maquina": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metodo": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "material": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "medicao": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "meio_ambiente": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "plan_5porques": {
+      "type": "array",
+      "description": "Sequ\u00eancia de 5 Porqu\u00eas",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pergunta": {
+            "type": "string"
+          },
+          "resposta": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "do_acoes_5w2h": {
+      "type": "array",
+      "description": "Plano de a\u00e7\u00e3o 5W2H",
+      "items": {
+        "type": "object",
+        "properties": {
+          "o_que": {
+            "type": "string"
+          },
+          "por_que": {
+            "type": "string"
+          },
+          "quem": {
+            "type": "string"
+          },
+          "onde": {
+            "type": "string"
+          },
+          "quando": {
+            "type": "string"
+          },
+          "como": {
+            "type": "string"
+          },
+          "quanto_custa": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Pendente",
+              "Em andamento",
+              "Conclu\u00edda"
+            ],
+            "default": "Pendente"
+          }
+        }
+      }
+    },
+    "check_resultados": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o dos resultados observados ap\u00f3s as a\u00e7\u00f5es"
+    },
+    "check_indicadores": {
+      "type": "string",
+      "description": "Indicadores de qualidade acompanhados"
+    },
+    "check_evidencias_urls": {
+      "type": "array",
+      "description": "URLs de evid\u00eancias anexadas (imagens, documentos)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "check_eficaz": {
+      "type": "boolean",
+      "description": "As a\u00e7\u00f5es foram eficazes?"
+    },
+    "act_licoes_aprendidas": {
+      "type": "string",
+      "description": "Li\u00e7\u00f5es aprendidas para compartilhar com a equipe"
+    },
+    "act_padronizacao": {
+      "type": "string",
+      "description": "O que foi padronizado / alterado nos processos"
+    },
+    "act_pop_vinculado": {
+      "type": "string",
+      "description": "POP criado ou atualizado como resultado"
+    },
+    "act_criar_novo_pop": {
+      "type": "boolean",
+      "description": "Necessita criar novo POP?",
+      "default": false
+    },
+    "prazo_conclusao": {
+      "type": "string",
+      "format": "date",
+      "description": "Data alvo de conclus\u00e3o do A3"
+    },
+    "deleted": {
+      "type": "boolean",
+      "default": false
+    },
+    "deleted_by": {
+      "type": "string"
+    },
+    "deleted_at": {
+      "type": "string"
+    },
+    "updated_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "titulo",
+    "dono",
+    "tipo",
+    "prioridade"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.dono": "{{user.full_name}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.dono": "{{user.full_name}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

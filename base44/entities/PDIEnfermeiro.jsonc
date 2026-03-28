@@ -1,0 +1,140 @@
+{
+  "name": "PDIEnfermeiro",
+  "type": "object",
+  "properties": {
+    "colaborador_id": {
+      "type": "string",
+      "description": "ID/Nome do enfermeiro(a)"
+    },
+    "data_avaliacao": {
+      "type": "string",
+      "format": "date",
+      "description": "Data da avalia\u00e7\u00e3o"
+    },
+    "avaliador": {
+      "type": "string",
+      "description": "Nome de quem realizou a avalia\u00e7\u00e3o"
+    },
+    "competencias": {
+      "type": "array",
+      "description": "Lista de compet\u00eancias e suas avalia\u00e7\u00f5es",
+      "items": {
+        "type": "object",
+        "properties": {
+          "competencia_id": {
+            "type": "string",
+            "description": "ID da compet\u00eancia"
+          },
+          "nota": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "description": "Escala: 1=N\u00e3o Atende, 2=Em Desenvolvimento, 3=Atende Plenamente, 4=Supera Expectativas"
+          },
+          "observacoes": {
+            "type": "string",
+            "description": "Observa\u00e7\u00f5es e exemplos"
+          }
+        }
+      }
+    },
+    "pontos_fortes": {
+      "type": "string",
+      "description": "Resumo de pontos fortes"
+    },
+    "pontos_desenvolver": {
+      "type": "string",
+      "description": "Resumo de pontos a desenvolver"
+    },
+    "plano_acao": {
+      "type": "array",
+      "description": "Plano de desenvolvimento individual",
+      "items": {
+        "type": "object",
+        "properties": {
+          "competencia": {
+            "type": "string"
+          },
+          "acao": {
+            "type": "string"
+          },
+          "prazo": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "comentarios": {
+      "type": "string",
+      "description": "Coment\u00e1rios adicionais"
+    },
+    "deleted": {
+      "type": "boolean",
+      "default": false
+    },
+    "deleted_by": {
+      "type": "string"
+    },
+    "deleted_at": {
+      "type": "string"
+    },
+    "updated_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "colaborador_id",
+    "data_avaliacao",
+    "avaliador"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.avaliador": "{{user.full_name}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.avaliador": "{{user.full_name}}"
+        },
+        {
+          "data.colaborador_id": "{{user.full_name}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.avaliador": "{{user.full_name}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

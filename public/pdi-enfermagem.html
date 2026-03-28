@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de PDI e Período de Experiência</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @keyframes pulse-warning {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .badge-pending {
+      animation: pulse-warning 2s infinite;
+    }
+    .modal-hidden {
+      display: none;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .tab-btn {
+      transition: all 0.3s ease;
+    }
+    .tab-btn.active {
+      background-color: #2563eb;
+      color: white;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Cabeçalho -->
+  <div class="bg-white border-b border-gray-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-6 py-6">
+      <h1 class="text-3xl font-bold text-gray-800">Gestão de PDI e Período de Experiência</h1>
+      <p class="text-sm text-gray-500 mt-1">Enfermagem — Acompanhamento de Desenvolvimento Individual</p>
+    </div>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- Card de Registro -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <h2 class="text-lg font-bold text-gray-800 mb-4">Registrar Novo Colaborador</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <input
+          type="text"
+          id="nomeInput"
+          placeholder="Nome do Colaborador"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400"
+        />
+        <select id="cargoSelect" class="px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 bg-white">
+          <option value="">Selecione o Cargo</option>
+          <option value="Enfermeiro">Enfermeiro</option>
+          <option value="Técnico">Técnico de Enfermagem</option>
+        </select>
+        <input
+          type="date"
+          id="dataAdmissaoInput"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400"
+        />
+        <button onclick="registrarColaborador()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2">
+          <i class="fas fa-plus"></i> Registrar
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabela de Acompanhamento -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800 text-sm">Acompanhamento de Colaboradores</h3>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-100">
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Colaborador</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data Admissão</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Avaliação 30D</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Avaliação 60D</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Avaliação 90D</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBody">
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3">
+                <p class="font-medium text-gray-700">Carlos Lima</p>
+                <p class="text-xs text-gray-500">Técnico de Enfermagem</p>
+              </td>
+              <td class="px-4 py-3 text-gray-600 font-mono">10/02/2026</td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <i class="fas fa-check-circle"></i> Concluída
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 badge-pending">
+                  <i class="fas fa-clock"></i> Pendente
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300">
+                  <i class="fas fa-hourglass-end"></i> Aguardando
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <button onclick="abrirModal('Carlos Lima', 'Técnico de Enfermagem')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-xs">
+                  Abrir PDI
+                </button>
+              </td>
+            </tr>
+
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3">
+                <p class="font-medium text-gray-700">Ana Souza</p>
+                <p class="text-xs text-gray-500">Enfermeira</p>
+              </td>
+              <td class="px-4 py-3 text-gray-600 font-mono">01/03/2026</td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 badge-pending">
+                  <i class="fas fa-clock"></i> Pendente
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300">
+                  <i class="fas fa-hourglass-end"></i> Aguardando
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300">
+                  <i class="fas fa-hourglass-end"></i> Aguardando
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <button onclick="abrirModal('Ana Souza', 'Enfermeira')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-xs">
+                  Abrir PDI
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de Avaliação de PDI -->
+  <div id="modalPDI" class="modal-hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      
+      <!-- Cabeçalho do Modal -->
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
+        <h3 class="font-bold text-gray-800 text-lg">
+          Avaliação de PDI — <span id="modalNome">Carlos Lima</span> (<span id="modalCargo">Técnico</span>)
+        </h3>
+        <button onclick="fecharModal()" class="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+          <i class="fas fa-times text-gray-400 text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Navegação em Abas -->
+      <div class="px-6 py-3 border-b border-gray-100 flex gap-2 bg-gray-50">
+        <button class="tab-btn active px-4 py-2 rounded-lg font-semibold text-sm" onclick="mudarAba('30')">
+          <i class="fas fa-calendar"></i> 30 Dias
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm" onclick="mudarAba('60')">
+          <i class="fas fa-calendar"></i> 60 Dias
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg font-semibold text-sm" onclick="mudarAba('90')">
+          <i class="fas fa-calendar"></i> 90 Dias
+        </button>
+      </div>
+
+      <!-- Conteúdo das Abas -->
+      <div class="p-6 space-y-6">
+
+        <!-- Aba 30 Dias -->
+        <div id="aba-30" class="tab-content active">
+          <h4 class="font-semibold text-gray-800 mb-4">Avaliação de 30 Dias</h4>
+          
+          <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-4">
+            <p class="font-semibold text-gray-800 mb-2"><i class="fas fa-exclamation-triangle text-orange-600"></i> Período de Integração</p>
+            <p class="text-sm text-gray-600">Avaliação inicial do período de experiência.</p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <p class="font-semibold text-gray-700 mb-2">Domínio das Competências Essenciais</p>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="comp30" value="sim" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">✅ Alcançou</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="comp30" value="nao" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">❌ Não Alcançou</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <p class="font-semibold text-gray-700 mb-2">Integração com a Equipe</p>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="integ30" value="sim" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">✅ Alcançou</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="integ30" value="nao" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">❌ Não Alcançou</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <label class="block font-semibold text-gray-700 mb-2">Observações Gerais</label>
+            <textarea id="obs30" placeholder="Adicione observações sobre o período..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 resize-none h-24"></textarea>
+          </div>
+        </div>
+
+        <!-- Aba 60 Dias -->
+        <div id="aba-60" class="tab-content">
+          <h4 class="font-semibold text-gray-800 mb-4">Avaliação de 60 Dias</h4>
+          
+          <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-4">
+            <p class="font-semibold text-gray-800 mb-2"><i class="fas fa-exclamation-triangle text-orange-600"></i> Pontos de Atenção (Não alcançados nos 30 Dias)</p>
+            <p class="text-sm text-gray-700 font-medium">Competência: Punção Venosa e Acesso Difícil</p>
+            <p class="text-sm text-gray-600 mt-1">O colaborador apresentou melhora neste ciclo?</p>
+          </div>
+
+          <div class="bg-white border border-gray-200 p-4 rounded-lg mb-4">
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="melhoria60" value="sim" class="w-4 h-4">
+                <span class="text-sm text-gray-600">✅ Alcançou a Melhoria</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="melhoria60" value="nao" class="w-4 h-4">
+                <span class="text-sm text-gray-600">❌ Não Alcançou / Requer PDI Urgente</span>
+              </label>
+            </div>
+          </div>
+
+          <h5 class="font-semibold text-gray-800 mb-3">Competências do Período de 60 Dias</h5>
+
+          <div class="space-y-4">
+            <div>
+              <p class="font-semibold text-gray-700 mb-2">Agilidade e Fluxo (TAT)</p>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="tat60" value="sim" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">✅ Alcançou</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="tat60" value="nao" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">❌ Não Alcançou</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <p class="font-semibold text-gray-700 mb-2">Adesão ao Time-Out</p>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="timeout60" value="sim" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">✅ Alcançou</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="timeout60" value="nao" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">❌ Não Alcançou</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <label class="block font-semibold text-gray-700 mb-2">Plano de Ação para Pendências</label>
+            <textarea id="planoAcao60" placeholder="Descreva o novo plano de ação..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 resize-none h-24"></textarea>
+          </div>
+        </div>
+
+        <!-- Aba 90 Dias -->
+        <div id="aba-90" class="tab-content">
+          <h4 class="font-semibold text-gray-800 mb-4">Avaliação de 90 Dias</h4>
+          
+          <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-4">
+            <p class="font-semibold text-gray-800 mb-2"><i class="fas fa-star text-blue-600"></i> Avaliação Final do Período de Experiência</p>
+            <p class="text-sm text-gray-600">Decisão sobre continuidade ou redirecionamento.</p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <p class="font-semibold text-gray-700 mb-2">Desempenho Geral</p>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="desemp90" value="sim" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">✅ Aprovado — Continua Contrato</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="desemp90" value="nao" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">❌ Reprovado — Revisão Necessária</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <p class="font-semibold text-gray-700 mb-2">Recomendação Final</p>
+              <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="rec90" value="confirma" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">✅ Confirma no Setor</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="rec90" value="outro" class="w-4 h-4">
+                  <span class="text-sm text-gray-600">⏳ Redirecionar para Outro Setor</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <label class="block font-semibold text-gray-700 mb-2">Parecer Final</label>
+            <textarea id="parecer90" placeholder="Digite o parecer final..." class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 resize-none h-24"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rodapé do Modal -->
+      <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50 sticky bottom-0">
+        <button onclick="fecharModal()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors font-semibold text-sm">
+          Cancelar
+        </button>
+        <button onclick="salvarAvaliacao()" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-sm">
+          <i class="fas fa-check-circle"></i> Salvar Avaliação
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function registrarColaborador() {
+      const nome = document.getElementById('nomeInput').value;
+      const cargo = document.getElementById('cargoSelect').value;
+      const data = document.getElementById('dataAdmissaoInput').value;
+
+      if (!nome || !cargo || !data) {
+        alert('Por favor, preencha todos os campos');
+        return;
+      }
+
+      // Integrar com Google Apps Script / planilha
+      console.log('Novo colaborador:', { nome, cargo, data });
+      alert('Colaborador registrado com sucesso!');
+
+      // Limpar formulário
+      document.getElementById('nomeInput').value = '';
+      document.getElementById('cargoSelect').value = '';
+      document.getElementById('dataAdmissaoInput').value = '';
+    }
+
+    function abrirModal(nome, cargo) {
+      document.getElementById('modalNome').textContent = nome;
+      document.getElementById('modalCargo').textContent = cargo;
+      document.getElementById('modalPDI').classList.remove('modal-hidden');
+      mudarAba('30');
+    }
+
+    function fecharModal() {
+      document.getElementById('modalPDI').classList.add('modal-hidden');
+    }
+
+    function mudarAba(aba) {
+      // Ocultar todas as abas
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      // Mostrar aba selecionada
+      document.getElementById(`aba-${aba}`).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function salvarAvaliacao() {
+      // Integrar com Google Apps Script / planilha
+      const nome = document.getElementById('modalNome').textContent;
+      console.log(`Avaliação de ${nome} salva com sucesso!`);
+      alert(`Avaliação de ${nome} salva com sucesso!`);
+      fecharModal();
+    }
+
+    // Fechar modal ao clicar fora
+    document.getElementById('modalPDI').addEventListener('click', function(e) {
+      if (e.target === this) {
+        fecharModal();
+      }
+    });
+  </script>
+</body>
+</html>

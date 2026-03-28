@@ -1,40 +1,52 @@
-**Welcome to your Base44 project** 
+# Alphasonic — Gestão (Vite + React)
 
-**About**
+Painel e pesquisas com dados no **Google Sheets**, acesso via **Google Apps Script**.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## O que configurar (dois valores diferentes)
 
-This project contains everything you need to run your app locally.
+| O quê | Onde pegar | Onde colocar |
+|--------|------------|----------------|
+| **ID da planilha** | URL do Sheets: `https://docs.google.com/spreadsheets/d/ESTE_ID_AQUI/edit` | No **Apps Script**, variável `SPREADSHEET_ID` em `google-apps-script/Code.gs` (e o mesmo no projeto em script.google.com). |
+| **URL do Web App** | Termina em `/exec` (Implantar → App da Web) | `VITE_SHEETS_API_URL` e/ou `APPS_SCRIPT_WEB_APP_URL` — veja `.env.example`. |
 
-**Edit the code in your local development environment**
+O front **não** grava o ID da planilha; só fala com o script via HTTP.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+## Como rodar
 
-**Prerequisites:** 
-
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
-
-```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
-
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+```bash
+npm install
+cp .env.example .env
+# Edite .env com a URL /exec ou use /api/sheets + proxy na Vercel
+npm run dev
 ```
 
-Run the app: `npm run dev`
+Build:
 
-**Publish your changes**
+```bash
+npm run build
+```
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+## Variáveis de ambiente
 
-**Docs & Support**
+Copie `.env.example` para `.env` (o `.env` não deve ir para o Git).
 
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
+- **Desenvolvimento:** pode usar a URL `/exec` direta em `VITE_SHEETS_API_URL` (às vezes o navegador bloqueia por CORS) ou `npx vercel dev` com o proxy.
+- **Produção (Vercel):** `VITE_SHEETS_API_URL=/api/sheets` e, nas variáveis do **servidor**, `APPS_SCRIPT_WEB_APP_URL` = URL `/exec` completa.
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
-# alpha
+## Google Apps Script
+
+Instruções detalhadas: [google-apps-script/README.md](google-apps-script/README.md).
+
+## GitHub
+
+Crie o repositório na conta desejada e:
+
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/USUARIO/NOME-DO-REPO.git
+git push -u origin main
+```
+
+Não commite `.env` (já está no `.gitignore`).

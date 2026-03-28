@@ -1,0 +1,179 @@
+{
+  "name": "SurveyResponse",
+  "type": "object",
+  "properties": {
+    "tipo_atendimento": {
+      "type": "string",
+      "enum": [
+        "Raio-X",
+        "Ultrassom",
+        "Tomografia",
+        "Resson\u00e2ncia Magn\u00e9tica",
+        "Exames Laboratoriais"
+      ],
+      "description": "Tipo de atendimento SADT"
+    },
+    "perfil_respondente": {
+      "type": "string",
+      "enum": [
+        "Paciente",
+        "Acompanhante",
+        "Outro"
+      ],
+      "description": "Perfil do respondente"
+    },
+    "agendamento_claro": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "agendamento_informacoes": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "agendamento_duvidas": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "preparo_instrucoes": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "preparo_orientacoes_risco": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "preparo_acolhimento": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "exame_tempo_espera": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "exame_empatia_equipe": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "exame_explicacoes": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "exame_seguranca": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "posexame_resultado": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "posexame_cuidados": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "posexame_fluxo_saida": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "avaliacao_geral": {
+      "type": "string",
+      "enum": [
+        "\u00d3timo",
+        "Bom",
+        "Regular",
+        "Ruim"
+      ]
+    },
+    "nps_recomendacao": {
+      "type": "number",
+      "description": "Nota NPS de 0 a 10"
+    },
+    "comentarios_finais": {
+      "type": "string",
+      "description": "Coment\u00e1rios e sugest\u00f5es (opcional)"
+    }
+  },
+  "required": [
+    "tipo_atendimento",
+    "perfil_respondente",
+    "agendamento_claro",
+    "agendamento_informacoes",
+    "agendamento_duvidas",
+    "preparo_instrucoes",
+    "preparo_orientacoes_risco",
+    "preparo_acolhimento",
+    "exame_tempo_espera",
+    "exame_empatia_equipe",
+    "exame_explicacoes",
+    "exame_seguranca",
+    "posexame_resultado",
+    "posexame_cuidados",
+    "posexame_fluxo_saida",
+    "avaliacao_geral",
+    "nps_recomendacao"
+  ]
+}

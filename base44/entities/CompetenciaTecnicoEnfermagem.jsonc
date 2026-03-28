@@ -1,0 +1,54 @@
+{
+  "name": "CompetenciaTecnicoEnfermagem",
+  "type": "object",
+  "properties": {
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "Compet\u00eancias T\u00e9cnicas Assistenciais",
+        "Qualidade e Seguran\u00e7a do Paciente",
+        "Prote\u00e7\u00e3o Radiol\u00f3gica e Biosseguran\u00e7a",
+        "Compet\u00eancias Comportamentais"
+      ],
+      "description": "Categoria da compet\u00eancia"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome da compet\u00eancia"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o detalhada da compet\u00eancia"
+    },
+    "exemplos": {
+      "type": "string",
+      "description": "Exemplos de comportamentos esperados"
+    },
+    "ordem": {
+      "type": "integer",
+      "description": "Ordem de exibi\u00e7\u00e3o"
+    },
+    "ativa": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se a compet\u00eancia est\u00e1 ativa"
+    },
+    "deleted": {
+      "type": "boolean",
+      "default": false
+    },
+    "deleted_by": {
+      "type": "string"
+    },
+    "deleted_at": {
+      "type": "string"
+    },
+    "updated_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "categoria",
+    "nome"
+  ]
+}

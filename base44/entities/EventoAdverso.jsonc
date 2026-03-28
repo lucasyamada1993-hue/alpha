@@ -1,0 +1,58 @@
+{
+  "name": "EventoAdverso",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do evento"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "Extravasamento",
+        "Flebite",
+        "Queda",
+        "Rea\u00e7\u00e3o Al\u00e9rgica",
+        "Outro"
+      ],
+      "description": "Tipo de evento adverso"
+    },
+    "gravidade": {
+      "type": "string",
+      "enum": [
+        "Leve",
+        "Moderada",
+        "Grave"
+      ],
+      "description": "Gravidade do evento"
+    },
+    "paciente_id": {
+      "type": "string",
+      "description": "Identifica\u00e7\u00e3o do paciente"
+    },
+    "setor": {
+      "type": "string",
+      "description": "Setor onde ocorreu"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o detalhada do evento"
+    },
+    "notificado_por": {
+      "type": "string",
+      "description": "Profissional que notificou"
+    },
+    "plano_acao_aberto": {
+      "type": "boolean",
+      "default": false,
+      "description": "Se um plano de a\u00e7\u00e3o foi aberto"
+    }
+  },
+  "required": [
+    "data",
+    "tipo",
+    "gravidade",
+    "setor"
+  ]
+}

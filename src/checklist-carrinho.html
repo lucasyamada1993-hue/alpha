@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria Diária do Carrinho de Emergência - Radiologia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col">
+        <!-- CABEÇALHO -->
+        <header class="bg-white border-b border-gray-200 shadow-sm">
+            <div class="max-w-6xl mx-auto px-6 py-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-pills text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-800">Checklist do Carrinho de Emergência (SADT)</h1>
+                </div>
+                <p class="text-sm text-gray-500">Auditoria Diária de Medicações Críticas</p>
+            </div>
+
+            <!-- INFO E SELECT -->
+            <div class="bg-blue-50 border-t border-blue-100">
+                <div class="max-w-6xl mx-auto px-6 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                        <!-- Data/Hora -->
+                        <div>
+                            <p class="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Data e Hora</p>
+                            <p class="text-lg font-bold text-gray-800" id="dataHoraAtual">—</p>
+                        </div>
+
+                        <!-- Selecionar Carrinho -->
+                        <div>
+                            <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider block mb-2">Selecione o Carrinho</label>
+                            <select id="carrinhoSelect" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200 bg-white">
+                                <option value="">-- Escolha um carrinho --</option>
+                                <option value="rm01">Ressonância Magnética 01</option>
+                                <option value="tc01">Tomografia 01</option>
+                                <option value="prep01">Sala de Preparo 01</option>
+                                <option value="raio01">Sala de Raio-X 01</option>
+                            </select>
+                        </div>
+
+                        <!-- Última Auditoria -->
+                        <div>
+                            <p class="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Última Auditoria</p>
+                            <p class="text-lg font-bold text-gray-800" id="ultimaAuditoria">Nunca realizada</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="max-w-6xl mx-auto w-full px-6 py-8 flex-1">
+            <!-- TABELA DE MEDICAÇÕES -->
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-stethoscope text-blue-600"></i>
+                        Medicações Críticas (Padrão OMS/ACLS para Radiologia)
+                    </h2>
+                    <p class="text-xs text-gray-600 mt-1">Preencha as quantidades atuais e datas de validade de cada item</p>
+                </div>
+
+                <!-- TABELA RESPONSIVA -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" id="tabelaMedicacoes">
+                        <thead>
+                            <tr class="bg-gray-100 border-b border-gray-200">
+                                <th class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider text-xs">Medicação / Item</th>
+                                <th class="px-6 py-3 text-center font-semibold text-gray-700 uppercase tracking-wider text-xs">Qtd. Padrão</th>
+                                <th class="px-6 py-3 text-center font-semibold text-gray-700 uppercase tracking-wider text-xs">Qtd. Atual</th>
+                                <th class="px-6 py-3 text-center font-semibold text-gray-700 uppercase tracking-wider text-xs">Validade Mais Próxima</th>
+                                <th class="px-6 py-3 text-center font-semibold text-gray-700 uppercase tracking-wider text-xs">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaMedicacoes">
+                            <!-- Preenchido por JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- RESUMO VISUAL -->
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    <div class="flex gap-6">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Total de Itens</p>
+                            <p class="text-2xl font-bold text-gray-800" id="totalItens">0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Conformes</p>
+                            <p class="text-2xl font-bold text-emerald-600" id="itensConformes">0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Reposição Pendente</p>
+                            <p class="text-2xl font-bold text-red-600" id="itensAlerta">0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Vencimento Próximo</p>
+                            <p class="text-2xl font-bold text-amber-600" id="itensAviso">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OBSERVAÇÕES E FECHAMENTO -->
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mt-6">
+                <div class="px-6 py-5 border-b border-gray-200 bg-gray-50">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-clipboard-check text-gray-600"></i>
+                        Finalização da Auditoria
+                    </h3>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- OBSERVAÇÕES -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Observações Gerais</label>
+                        <textarea id="observacoes" placeholder="Descreva qualquer ocorrência, dano ou necessidade especial..." rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200 resize-none"></textarea>
+                    </div>
+
+                    <!-- CHECKBOX OBRIGATÓRIO -->
+                    <div class="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                        <input type="checkbox" id="confirmacao" class="w-5 h-5 mt-1 cursor-pointer accent-amber-600">
+                        <label for="confirmacao" class="text-sm text-gray-700 cursor-pointer">
+                            <span class="font-semibold">Declaro que conferi fisicamente todos os itens</span> e rompi o lacre anterior do carrinho. Confirmo a acurácia das informações registradas.
+                        </label>
+                    </div>
+
+                    <!-- NÚMERO DO NOVO LACRE -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Número do Novo Lacre <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="novoLacre" placeholder="Ex: #4591" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200 font-mono text-lg">
+                        <p class="text-xs text-gray-500 mt-1">Campo obrigatório para lacrar o carrinho</p>
+                    </div>
+
+                    <!-- BOTÃO DE AÇÃO -->
+                    <div class="flex gap-3 pt-4">
+                        <button id="btnLimpar" onclick="limparFormulario()" class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 font-semibold transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-redo"></i>
+                            Limpar Formulário
+                        </button>
+                        <button id="btnLacrar" onclick="lacrarCarrinho()" class="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-lock"></i>
+                            Assinar e Lacrar Carrinho
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // DADOS MASTER (Vem do Banco)
+        const medicacoes = [
+            { id: 1, nome: "Adrenalina 1mg/ml (Ampola)", qtdPadrao: 10, categoria: "Cardiovascular" },
+            { id: 2, nome: "Hidrocortisona 500mg (Alergia a Contraste)", qtdPadrao: 5, categoria: "Alergia" },
+            { id: 3, nome: "Prometazina 50mg/2ml", qtdPadrao: 5, categoria: "Anti-histamínico" },
+            { id: 4, nome: "Amiodarona 150mg/3ml (Arritmia)", qtdPadrao: 6, categoria: "Cardiovascular" },
+            { id: 5, nome: "Atropina 0,25mg/ml", qtdPadrao: 10, categoria: "Cardiovascular" },
+            { id: 6, nome: "Flumazenil 0,1mg/ml (Reversão Sedação)", qtdPadrao: 5, categoria: "Sedação" },
+        ];
+
+        let auditoria = {
+            carrinho: null,
+            itens: {},
+            observacoes: "",
+            confirmacao: false,
+            novoLacre: "",
+        };
+
+        // INICIALIZAR
+        function inicializar() {
+            atualizarDataHora();
+            preencherTabelaMedicacoes();
+            adicionarEventListeners();
+            setInterval(atualizarDataHora, 1000);
+        }
+
+        // ATUALIZAR DATA E HORA
+        function atualizarDataHora() {
+            const agora = new Date();
+            const opcoes = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.getElementById("dataHoraAtual").textContent = agora.toLocaleDateString('pt-BR', opcoes);
+        }
+
+        // PREENCHER TABELA
+        function preencherTabelaMedicacoes() {
+            const tbody = document.getElementById("corpoTabelaMedicacoes");
+            tbody.innerHTML = "";
+
+            medicacoes.forEach((med) => {
+                const tr = document.createElement("tr");
+                tr.id = `linha-${med.id}`;
+                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors";
+
+                const inputQtdAtual = document.createElement("input");
+                inputQtdAtual.type = "number";
+                inputQtdAtual.min = 0;
+                inputQtdAtual.id = `qtd-${med.id}`;
+                inputQtdAtual.className = "w-20 px-3 py-2.5 border border-gray-300 rounded text-sm text-center outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200 font-semibold text-lg";
+                inputQtdAtual.placeholder = "0";
+                inputQtdAtual.onchange = () => validarLinha(med.id);
+                inputQtdAtual.oninput = () => validarLinha(med.id);
+
+                const inputValidade = document.createElement("input");
+                inputValidade.type = "month";
+                inputValidade.id = `val-${med.id}`;
+                inputValidade.className = "w-32 px-3 py-2.5 border border-gray-300 rounded text-sm text-center outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-200";
+                inputValidade.onchange = () => validarLinha(med.id);
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-semibold text-gray-800">${med.nome}</td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="inline-block px-3 py-2 bg-gray-100 text-gray-600 font-mono font-bold rounded text-sm flex items-center gap-2">
+                            <i class="fas fa-lock text-xs"></i>
+                            ${med.qtdPadrao}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-center"></td>
+                    <td class="px-6 py-4 text-center"></td>
+                    <td class="px-6 py-4 text-center"><span id="status-${med.id}" class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-600">Pendente</span></td>
+                `;
+
+                const tdQtd = tr.cells[2];
+                tdQtd.appendChild(inputQtdAtual);
+
+                const tdVal = tr.cells[3];
+                tdVal.appendChild(inputValidade);
+
+                tbody.appendChild(tr);
+
+                auditoria.itens[med.id] = {
+                    nome: med.nome,
+                    qtdPadrao: med.qtdPadrao,
+                    qtdAtual: 0,
+                    validade: null,
+                    status: "pendente",
+                };
+            });
+        }
+
+        // VALIDAR LINHA
+        function validarLinha(medId) {
+            const qtdAtualInput = document.getElementById(`qtd-${medId}`);
+            const validadeInput = document.getElementById(`val-${medId}`);
+            const statusSpan = document.getElementById(`status-${medId}`);
+            const linha = document.getElementById(`linha-${medId}`);
+
+            const medicacao = medicacoes.find(m => m.id === medId);
+            const qtdAtual = parseInt(qtdAtualInput.value) || 0;
+            const validade = validadeInput.value;
+
+            auditoria.itens[medId].qtdAtual = qtdAtual;
+            auditoria.itens[medId].validade = validade;
+
+            let status = "ok";
+            let statusTexto = "✓ Estoque OK";
+            let statusCor = "bg-emerald-50 text-emerald-700";
+
+            // Validar quantidade
+            if (qtdAtual < medicacao.qtdPadrao) {
+                status = "alerta";
+                statusTexto = "⚠ Repor Imediatamente";
+                statusCor = "bg-red-50 text-red-700";
+                linha.className = "border-b border-gray-100 bg-red-50 hover:bg-red-100 transition-colors";
+            } else {
+                linha.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors";
+            }
+
+            // Validar validade
+            if (validade) {
+                const dataValidade = new Date(validade + "-01");
+                const hoje = new Date();
+                const diasAteVencimento = Math.floor((dataValidade - hoje) / (1000 * 60 * 60 * 24));
+
+                validadeInput.classList.remove("border-amber-400", "border-red-500");
+
+                if (diasAteVencimento < 0) {
+                    // Vencido
+                    validadeInput.classList.add("border-red-500", "ring-1", "ring-red-200");
+                    statusTexto = "🔴 VENCIDO";
+                    statusCor = "bg-red-100 text-red-800 font-bold";
+                    status = "vencido";
+                    linha.className = "border-b border-gray-100 bg-red-100 hover:bg-red-100 transition-colors";
+                } else if (diasAteVencimento <= 30) {
+                    // Vence este mês
+                    validadeInput.classList.add("border-amber-400", "ring-1", "ring-amber-200");
+                    if (status !== "alerta") {
+                        statusTexto = "⏰ Vence este mês";
+                        statusCor = "bg-amber-50 text-amber-700";
+                        status = "aviso";
+                        linha.className = "border-b border-gray-100 bg-amber-50 hover:bg-amber-100 transition-colors";
+                    }
+                }
+            }
+
+            auditoria.itens[medId].status = status;
+            statusSpan.textContent = statusTexto;
+            statusSpan.className = `text-xs font-semibold px-2 py-1 rounded-full ${statusCor}`;
+
+            atualizarResumo();
+        }
+
+        // ATUALIZAR RESUMO
+        function atualizarResumo() {
+            const itens = Object.values(auditoria.itens);
+            const total = itens.length;
+            const conformes = itens.filter(i => i.status === "ok").length;
+            const alertas = itens.filter(i => i.status === "alerta" || i.status === "vencido").length;
+            const avisos = itens.filter(i => i.status === "aviso").length;
+
+            document.getElementById("totalItens").textContent = total;
+            document.getElementById("itensConformes").textContent = conformes;
+            document.getElementById("itensAlerta").textContent = alertas;
+            document.getElementById("itensAviso").textContent = avisos;
+
+            // Validar botão
+            const temAlerta = alertas > 0 || itens.some(i => i.status === "vencido");
+            const temVencido = itens.some(i => i.status === "vencido");
+            const confirmacao = document.getElementById("confirmacao").checked;
+            const novoLacre = document.getElementById("novoLacre").value.trim();
+
+            const btnLacrar = document.getElementById("btnLacrar");
+            btnLacrar.disabled = temVencido || !confirmacao || !novoLacre;
+        }
+
+        // ADICIONAR EVENT LISTENERS
+        function adicionarEventListeners() {
+            document.getElementById("carrinhoSelect").addEventListener("change", (e) => {
+                auditoria.carrinho = e.target.value;
+            });
+
+            document.getElementById("observacoes").addEventListener("change", (e) => {
+                auditoria.observacoes = e.target.value;
+            });
+
+            document.getElementById("novoLacre").addEventListener("input", () => {
+                atualizarResumo();
+            });
+
+            document.getElementById("confirmacao").addEventListener("change", (e) => {
+                auditoria.confirmacao = e.target.checked;
+                atualizarResumo();
+            });
+        }
+
+        // LACRAR CARRINHO
+        function lacrarCarrinho() {
+            if (!auditoria.carrinho) {
+                alert("Selecione um carrinho!");
+                return;
+            }
+
+            if (!document.getElementById("confirmacao").checked) {
+                alert("Você deve confirmar a auditoria!");
+                return;
+            }
+
+            if (!document.getElementById("novoLacre").value.trim()) {
+                alert("Informe o número do novo lacre!");
+                return;
+            }
+
+            const temVencido = Object.values(auditoria.itens).some(i => i.status === "vencido");
+            if (temVencido) {
+                alert("Não é possível lacrar o carrinho com medicações vencidas!");
+                return;
+            }
+
+            // Log dos dados
+            console.log("AUDITORIA FINALIZADA:", auditoria);
+
+            // Simulação de salvamento
+            alert(`✅ Carrinho ${auditoria.carrinho} lacrado com sucesso!\nLacre: ${document.getElementById("novoLacre").value}\n\nDados enviados para registro.`);
+
+            // Aqui você enviaria os dados para o servidor
+            // fetch('/api/auditoria/salvar', { method: 'POST', body: JSON.stringify(auditoria) })
+        }
+
+        // LIMPAR FORMULÁRIO
+        function limparFormulario() {
+            if (confirm("Tem certeza que deseja limpar o formulário?")) {
+                document.querySelectorAll("input[type='number']").forEach(input => input.value = "");
+                document.querySelectorAll("input[type='month']").forEach(input => input.value = "");
+                document.getElementById("observacoes").value = "";
+                document.getElementById("novoLacre").value = "";
+                document.getElementById("confirmacao").checked = false;
+
+                medicacoes.forEach(med => {
+                    validarLinha(med.id);
+                });
+            }
+        }
+
+        // INICIAR AO CARREGAR
+        window.addEventListener("DOMContentLoaded", inicializar);
+    </script>
+</body>
+</html>
