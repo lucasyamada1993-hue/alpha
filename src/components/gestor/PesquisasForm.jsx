@@ -4,7 +4,7 @@ import { surveyStore } from "@/lib/surveyStore";
 
 const TIPOS = ["Escala Ótimo-Ruim", "Múltipla Escolha", "NPS 0-10", "Texto Aberto"];
 
-const makeEmpty = () => ({ pergunta: "", categoria: surveyStore.getCategories()[0] || "Agendamento", tipo: "Escala Ótimo-Ruim" });
+const makeEmpty = () => ({ pergunta: "", categoria: surveyStore.getCategories()[0] || "Primeiro Contato", tipo: "Escala Ótimo-Ruim" });
 
 export default function PesquisasForm({ onSave, editingItem, onCancelEdit }) {
   const [form, setForm] = useState(makeEmpty());

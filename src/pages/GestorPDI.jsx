@@ -1,6 +1,38 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import AvaliacaoTecnico from "@/components/gestor/pdi-tecnico/AvaliacaoTecnico";
+import AvaliacaoEnfermeiro from "@/components/gestor/pdi-enfermeiro/AvaliacaoEnfermeiro";
 
+/**
+ * Persistência (sheetsClient): Técnico de Enfermagem → entidade PDITecnicoEnfermagem; Enfermeiro(a) → PDIEnfermeiro.
+ * Planilhas distintas por categoria. Novas categorias = novas entidades no cliente + ramo por cargo em Avaliar.
+ */
+
+function kpisParaLista(rows) {
+  const n = rows.length;
+  let concluidos = 0;
+  let pendentes = 0;
+  for (const f of rows) {
+    for (const key of ["pdi30", "pdi60", "pdi90"]) {
+      if (f[key].status === "concluido") concluidos++;
+      if (f[key].status === "pendente") pendentes++;
+    }
+  }
+  const alertas = rows.filter((f) =>
+    [f.pdi30, f.pdi60, f.pdi90].some((p) => p.status === "pendente")
+  ).length;
+  const denom = n * 3;
+  const fmt = (num) => (n === 0 ? "0" : `${num}/${denom}`);
+  return [
+    { label: "PDIs Concluídos", value: fmt(concluidos), color: "bg-emerald-50 text-emerald-600 border-l-emerald-500" },
+    { label: "PDIs Pendentes", value: fmt(pendentes), color: "bg-amber-50 text-amber-600 border-l-amber-500" },
+    { label: "Funcionários Ativos", value: String(n), color: "bg-blue-50 text-blue-600 border-l-blue-500" },
+    { label: "Alertas de Vencimento", value: String(alertas), color: "bg-red-50 text-red-600 border-l-red-500" },
+  ];
+}
+
+// Nomes alinhados às listas TECNICOS / ENFERMEIROS em AvaliacaoTecnico / AvaliacaoEnfermeiro (mock). Fonte futura: cadastro único.
 const FUNCIONARIOS_PDI = [
   {
     id: 1,
@@ -49,139 +81,33 @@ function BadgePDI({ status }) {
   );
 }
 
-// Dynamic form content based on cargo
-function PDIFormContent({ etapa, cargo }) {
-  const isTecnico = cargo === "Técnico de Enfermagem";
-  const isEnfermeiro = cargo === "Enfermeiro(a)";
-
-  if (etapa === "30") {
-    return (
-      <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800">Avaliação de 30 Dias</h4>
-        <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-          <p className="text-sm text-gray-700">Período de integração inicial e domínio de competências essenciais.</p>
-        </div>
-        {isTecnico && (
-          <div>
-            <p className="font-semibold text-gray-700 mb-2">Competências Técnicas Essenciais</p>
-            <div className="space-y-2">
-              <label className="flex items-center gap-2">
-                <input type="radio" name="comp30_tecnico" className="w-4 h-4" />
-                <span className="text-sm text-gray-600">✅ Domina punção venosa e acesso periférico</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="comp30_tecnico" className="w-4 h-4" />
-                <span className="text-sm text-gray-600">✅ Segue protocolos de biosseguranța</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="comp30_tecnico" className="w-4 h-4" />
-                <span className="text-sm text-gray-600">❌ Requer acompanhamento</span>
-              </label>
-            </div>
-          </div>
-        )}
-        {isEnfermeiro && (
-          <div>
-            <p className="font-semibold text-gray-700 mb-2">Competências Clínicas Avançadas</p>
-            <div className="space-y-2">
-              <label className="flex items-center gap-2">
-                <input type="radio" name="comp30_enf" className="w-4 h-4" />
-                <span className="text-sm text-gray-600">✅ Conhecimento de protocolos de qualidade</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="comp30_enf" className="w-4 h-4" />
-                <span className="text-sm text-gray-600">✅ Liderança e comunicação efetiva</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="comp30_enf" className="w-4 h-4" />
-                <span className="text-sm text-gray-600">❌ Requer desenvolvimento</span>
-              </label>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (etapa === "60") {
-    return (
-      <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800">Avaliação de 60 Dias</h4>
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-          <p className="font-semibold text-gray-800 mb-2">⚠️ Desenvolvimento de Competências</p>
-          <p className="text-sm text-gray-700">Avaliação de progresso e identificação de pontos para melhoria.</p>
-        </div>
-        <div>
-          <p className="font-semibold text-gray-700 mb-2">O colaborador apresentou melhora desde o 30º dia?</p>
-          <div className="flex gap-3">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="melhoria60" className="w-4 h-4" />
-              <span className="text-sm text-gray-600">✅ Melhorou significativamente</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="melhoria60" className="w-4 h-4" />
-              <span className="text-sm text-gray-600">❌ Requer atenção e PDI</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (etapa === "90") {
-    return (
-      <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800">Avaliação Final - 90 Dias</h4>
-        <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-          <p className="text-sm text-gray-700">Decisão final sobre continuidade do vínculo e permanência na equipe.</p>
-        </div>
-        <div>
-          <p className="font-semibold text-gray-700 mb-2">Desempenho Geral do Colaborador</p>
-          <div className="flex gap-3">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="desemp90" className="w-4 h-4" />
-              <span className="text-sm text-gray-600">✅ Aprovado - Mantém Vínculo</span>
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="desemp90" className="w-4 h-4" />
-              <span className="text-sm text-gray-600">❌ Reprovado - Encerramento</span>
-            </label>
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
+const CARGO_TECNICO = "Técnico de Enfermagem";
+const CARGO_ENFERMEIRO = "Enfermeiro(a)";
 
 export default function GestorPDI() {
-  const [selecionado, setSelecionado] = useState(null);
-  const [etapa, setEtapa] = useState("30");
+  const kpis = useMemo(() => kpisParaLista(FUNCIONARIOS_PDI), []);
 
-  const abrirPDI = (funcionario, periodo) => {
-    setSelecionado({ ...funcionario, periodo });
-    setEtapa(periodo);
+  const [avaliacaoModal, setAvaliacaoModal] = useState(null);
+
+  const abrirAvaliacaoCompleta = (funcionario) => {
+    if (funcionario.cargo !== CARGO_TECNICO && funcionario.cargo !== CARGO_ENFERMEIRO) {
+      toast.error("Cargo sem formulário PDI configurado. Use o cadastro para definir Técnico ou Enfermeiro.");
+      return;
+    }
+    setAvaliacaoModal({ funcionario });
   };
 
-  const fecharPDI = () => {
-    setSelecionado(null);
-  };
+  const fecharAvaliacao = () => setAvaliacaoModal(null);
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h1 className="text-2xl font-bold text-gray-800">PDI — Plano de Desenvolvimento Individual</h1>
         <p className="text-sm text-gray-500 mt-1">Acompanhamento do período de experiência (30/60/90 dias)</p>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {[
-          { label: "PDIs Concluídos", value: "1/3", color: "bg-emerald-50 text-emerald-600 border-l-emerald-500" },
-          { label: "PDIs Pendentes", value: "2/3", color: "bg-amber-50 text-amber-600 border-l-amber-500" },
-          { label: "Funcionários Ativos", value: "3", color: "bg-blue-50 text-blue-600 border-l-blue-500" },
-          { label: "Alertas de Vencimento", value: "1", color: "bg-red-50 text-red-600 border-l-red-500" },
-        ].map((k, i) => (
+        {kpis.map((k, i) => (
           <div key={i} className={cn("bg-white rounded-xl border border-gray-200 border-l-4 p-4 shadow-sm", k.color)}>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{k.label}</p>
             <p className="text-2xl font-bold mt-2">{k.value}</p>
@@ -189,7 +115,6 @@ export default function GestorPDI() {
         ))}
       </div>
 
-      {/* Tabela de PDIs */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h3 className="font-semibold text-gray-800 text-sm">Acompanhamento de PDIs</h3>
@@ -225,7 +150,8 @@ export default function GestorPDI() {
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button
-                      onClick={() => abrirPDI(func, "30")}
+                      type="button"
+                      onClick={() => abrirAvaliacaoCompleta(func)}
                       className="bg-blue-600 text-white px-3 py-1 rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors"
                     >
                       Avaliar
@@ -238,68 +164,42 @@ export default function GestorPDI() {
         </div>
       </div>
 
-      {/* Modal de Avaliação */}
-      {selecionado && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Cabeçalho */}
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
-              <h3 className="font-bold text-gray-800 text-lg">
-                PDI {etapa}D — {selecionado.nome} ({selecionado.cargo})
-              </h3>
-              <button onClick={fecharPDI} className="p-1 hover:bg-gray-100 rounded-lg">
-                <span className="text-gray-400 text-2xl">×</span>
-              </button>
-            </div>
-
-            {/* Abas */}
-            <div className="px-6 py-3 border-b border-gray-100 flex gap-2 bg-gray-50">
-              {["30", "60", "90"].map((periodo) => (
-                <button
-                  key={periodo}
-                  onClick={() => setEtapa(periodo)}
-                  className={cn(
-                    "px-4 py-2 rounded-lg font-semibold text-sm transition-all",
-                    etapa === periodo
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"
-                  )}
-                >
-                  {periodo} Dias
-                </button>
-              ))}
-            </div>
-
-            {/* Conteúdo */}
-            <div className="p-6 space-y-6">
-              <PDIFormContent etapa={etapa} cargo={selecionado.cargo} />
-
+      {avaliacaoModal && (
+        <div className="fixed inset-0 z-[60] flex flex-col bg-black/50">
+          <div className="flex min-h-0 flex-1 flex-col bg-white md:mx-auto md:my-4 md:max-h-[calc(100vh-2rem)] md:max-w-4xl md:rounded-xl md:shadow-2xl w-full overflow-hidden">
+            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
               <div>
-                <label className="block font-semibold text-gray-700 mb-2">Observações</label>
-                <textarea
-                  placeholder="Adicione observações..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-400 resize-none h-24"
-                />
+                <h2 className="text-lg font-bold text-gray-800">Avaliação PDI completa</h2>
+                <p className="text-xs text-gray-500">
+                  {avaliacaoModal.funcionario.nome} · {avaliacaoModal.funcionario.cargo}
+                </p>
               </div>
+              <button
+                type="button"
+                onClick={fecharAvaliacao}
+                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                aria-label="Fechar"
+              >
+                <span className="text-2xl leading-none">×</span>
+              </button>
             </div>
-
-            {/* Rodapé */}
-            <div className="px-6 py-4 border-t border-gray-100 flex gap-3 justify-end bg-gray-50 sticky bottom-0">
-              <button
-                onClick={fecharPDI}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 font-semibold text-sm"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => {
-                  alert("PDI salvo com sucesso!");
-                  fecharPDI();
-                }}
-                className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-semibold text-sm"
-              >
-                Salvar Avaliação
-              </button>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              {avaliacaoModal.funcionario.cargo === CARGO_TECNICO && (
+                <AvaliacaoTecnico
+                  key={avaliacaoModal.funcionario.id}
+                  colaboradorInicial={avaliacaoModal.funcionario.nome}
+                  hideHeaderStats
+                  modoEmbutido
+                />
+              )}
+              {avaliacaoModal.funcionario.cargo === CARGO_ENFERMEIRO && (
+                <AvaliacaoEnfermeiro
+                  key={avaliacaoModal.funcionario.id}
+                  colaboradorInicial={avaliacaoModal.funcionario.nome}
+                  hideHeaderStats
+                  modoEmbutido
+                />
+              )}
             </div>
           </div>
         </div>

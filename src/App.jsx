@@ -1,4 +1,5 @@
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -27,7 +28,7 @@ import GestorPDI from './pages/GestorPDI';
 import GestorEventosNaoConformidades from './pages/GestorEventosNaoConformidades';
 import GestorQualidadeJornada from './pages/GestorQualidadeJornada';
 import GestorQualidadeCarrinho from './pages/GestorQualidadeCarrinho';
-
+import GestorDocumentos from './pages/GestorDocumentos';
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
@@ -72,9 +73,14 @@ const AuthenticatedApp = () => {
         <Route path="perfis" element={<GestorPerfis />} />
         <Route path="funcionarios" element={<GestorFuncionarios />} />
         <Route path="pdi" element={<GestorPDI />} />
+        <Route path="carrinho" element={<GestorQualidadeCarrinho />} />
+        <Route path="documentos" element={<GestorDocumentos />} />
       </Route>
       <Route path="/gerente-enfermagem" element={<GestorLayout />}>
         <Route path="" element={<GestorEnfermagem />} />
+        <Route path="pdi" element={<GestorPDI />} />
+        <Route path="evento-adverso" element={<GestorEventosNaoConformidades />} />
+        <Route path="documentos" element={<GestorDocumentos />} />
       </Route>
       <Route path="/gestor-qualidade" element={<GestorLayout />}>
         <Route path="" element={<GestorQualidadePage />} />
@@ -87,6 +93,7 @@ const AuthenticatedApp = () => {
         <Route path="melhoria" element={<GestorMelhoria />} />
         <Route path="pesquisas" element={<GestorPesquisas />} />
         <Route path="carrinho" element={<GestorQualidadeCarrinho />} />
+        <Route path="documentos" element={<GestorDocumentos />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
@@ -103,6 +110,7 @@ function App() {
           <AuthenticatedApp />
         </Router>
         <Toaster />
+        <SonnerToaster richColors position="top-right" />
       </QueryClientProvider>
     </AuthProvider>
   )

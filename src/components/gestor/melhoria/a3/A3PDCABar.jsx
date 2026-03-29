@@ -10,6 +10,13 @@ const FASES = [
 
 const ORDER = ["PLAN", "DO", "CHECK", "ACT", "Concluído"];
 
+const HINT_POR_FASE = {
+  PLAN: "Complete os campos obrigatórios do PLAN.",
+  DO: "Complete os campos obrigatórios do DO.",
+  CHECK: "Complete os campos obrigatórios do CHECK.",
+  ACT: "Complete os campos obrigatórios do ACT.",
+};
+
 export default function A3PDCABar({ statusAtual, onAvancar, podeAvancar, avancando }) {
   const currentIdx = ORDER.indexOf(statusAtual);
 
@@ -45,19 +52,29 @@ export default function A3PDCABar({ statusAtual, onAvancar, podeAvancar, avancan
         </div>
 
         {statusAtual !== "Concluído" && (
-          <button
-            onClick={onAvancar}
-            disabled={!podeAvancar || avancando}
-            title={!podeAvancar ? "Preencha todos os campos obrigatórios desta fase antes de avançar." : ""}
-            className={cn(
-              "ml-6 flex-shrink-0 flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all",
-              podeAvancar
-                ? "bg-[#0D47A1] hover:bg-[#0B3D91] text-white shadow-sm shadow-blue-200"
-                : "bg-gray-100 text-gray-300 cursor-not-allowed"
+          <div className="ml-6 flex-shrink-0 flex flex-col items-end gap-1 max-w-[min(100%,14rem)]">
+            {!podeAvancar && !avancando && (
+              <p className="text-[10px] text-amber-700 text-right leading-tight">
+                {HINT_POR_FASE[statusAtual] || "Complete os campos obrigatórios desta fase."}
+              </p>
             )}
-          >
-            {avancando ? "Salvando..." : `Avançar para ${ORDER[currentIdx + 1] || "Concluído"} →`}
-          </button>
+            <button
+              type="button"
+              onClick={onAvancar}
+              disabled={avancando}
+              aria-disabled={!podeAvancar && !avancando}
+              title={!podeAvancar ? "Clique para ver o que falta (mensagem no canto) ou preencha os campos." : "Avançar para a próxima fase"}
+              className={cn(
+                "flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all",
+                avancando && "opacity-70 cursor-wait",
+                podeAvancar && !avancando
+                  ? "bg-[#0D47A1] hover:bg-[#0B3D91] text-white shadow-sm shadow-blue-200"
+                  : !avancando && "bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-700 cursor-pointer",
+              )}
+            >
+              {avancando ? "Salvando..." : `Avançar para ${ORDER[currentIdx + 1] || "Concluído"} →`}
+            </button>
+          </div>
         )}
 
         {statusAtual === "Concluído" && (

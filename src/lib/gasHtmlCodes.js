@@ -102,7 +102,7 @@ export const HTML_CODE = `<!DOCTYPE html>
 
         <!-- NPS -->
         <div class="mt-6">
-          <p class="font-medium text-gray-700 mb-4">Em uma escala de 0 a 10, o quanto você recomendaria este serviço?</p>
+          <p class="font-medium text-gray-700 mb-4">O quanto você confiaria em recomendar a Alphasonic para amigos e familiares?</p>
           <div class="flex gap-2 flex-wrap" id="nps-container"></div>
           <input type="hidden" id="nps_recomendacao" name="nps_recomendacao" required/>
         </div>
@@ -110,7 +110,7 @@ export const HTML_CODE = `<!DOCTYPE html>
         <!-- Comentários -->
         <div class="mt-6">
           <p class="font-medium text-gray-700 mb-2">Comentários ou sugestões <span class="text-gray-400 text-sm font-normal">(opcional)</span></p>
-          <textarea name="comentarios_finais" rows="4" placeholder="Escreva aqui..."
+          <textarea name="comentarios_finais" rows="4" placeholder="Fique à vontade para deixar sua mensagem aqui"
             class="w-full border border-gray-200 rounded-xl p-4 text-gray-700 text-sm resize-none focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"></textarea>
         </div>
       </div>
@@ -143,20 +143,20 @@ export const HTML_CODE = `<!DOCTYPE html>
   var npsSelecionado = null;
 
   var PERGUNTAS = [
-    ["agendamento_claro","O processo de agendamento foi claro e acessível?"],
-    ["agendamento_informacoes","As informações sobre data, horário e local foram comunicadas adequadamente?"],
-    ["agendamento_duvidas","Houve facilidade em esclarecer dúvidas sobre o preparo?"],
-    ["preparo_acolhimento","Você se sentiu acolhido(a) pela equipe na recepção?"],
-    ["preparo_instrucoes","As instruções de preparo foram compreensíveis?"],
-    ["preparo_orientacoes_risco","A equipe orientou sobre desconfortos e cuidados pós-exame?"],
-    ["exame_tempo_espera","O tempo de espera foi adequado?"],
-    ["exame_empatia_equipe","A equipe técnica demonstrou empatia e profissionalismo?"],
-    ["exame_explicacoes","Você recebeu explicações claras sobre o exame?"],
-    ["exame_seguranca","Você se sentiu seguro(a) e confortável durante o exame?"],
-    ["posexame_resultado","Você foi orientado(a) sobre como obter o resultado?"],
-    ["posexame_cuidados","A equipe esclareceu cuidados específicos pós-exame?"],
-    ["posexame_fluxo_saida","O fluxo de saída foi rápido e organizado?"],
-    ["avaliacao_geral","De modo geral, como avalia a qualidade do atendimento?"]
+    ["agendamento_claro","Sentiu que o agendamento foi simples e tranquilo para você?"],
+    ["agendamento_informacoes","Sente que as orientações de dia e lugar foram passadas com todo o cuidado?"],
+    ["agendamento_duvidas","Sentiu que suas dúvidas foram ouvidas e respondidas com atenção?"],
+    ["preparo_acolhimento","Como você se sentiu ao ser recebido(a) por nossa equipe?"],
+    ["preparo_instrucoes","Nossas orientações de preparo foram simples e fáceis de seguir?"],
+    ["preparo_orientacoes_risco","Nossa equipe teve o cuidado de explicar tudo o que você precisava saber sobre o seu procedimento?"],
+    ["exame_tempo_espera","Como você sentiu o tempo em nossa recepção antes de ser chamado(a)?"],
+    ["exame_empatia_equipe","Nossa equipe tratou você com o acolhimento e empatia?"],
+    ["exame_explicacoes","Nossos profissionais explicaram cada passo do exame com paciência e clareza?"],
+    ["exame_seguranca","Em algum momento você deixou de se sentir seguro(a) e amparado(a) por nós?"],
+    ["posexame_resultado","Você se sente tranquilo(a) sobre como e quando receberá seus resultados?"],
+    ["posexame_cuidados","Ficou claro como você deve se cuidar após o procedimento de hoje?"],
+    ["posexame_fluxo_saida","O encerramento do seu atendimento foi prático e atencioso?"],
+    ["avaliacao_geral","De forma geral, como você avalia sua experiência na Alphasonic?"]
   ];
 
   var EXAMES = ["Raio-X","Ultrassom","Tomografia","Ressonância","Endoscopia","Laboratório","Hemodinâmica"];

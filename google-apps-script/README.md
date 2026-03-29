@@ -17,6 +17,16 @@
 3. Ajuste **`SPREADSHEET_ID`** com o ID da **sua** planilha (copiado da URL do Sheets).
 4. Na planilha, crie **uma aba por entidade** com nomes exatamente como em `TAB` no script (`GestorPerfil`, `Funcionario`, etc.).
 5. Na **linha 1** de cada aba, use os cabeçalhos definidos em `SHEET_HEADERS` no `Code.gs` (mesma ordem).
+
+### Aba `SurveyResponse` (pesquisa de satisfação)
+
+Use **exatamente** esta linha 1, **nessa ordem**, sem colunas vazias no fim (alinhado a `src/lib/surveyConfig.js`):
+
+`id` → `tipo_atendimento` → `perfil_respondente` → `nps_recomendacao` → `comentarios_finais` → `respondido_em` → `agendamento_claro` → `agendamento_informacoes` → `agendamento_duvidas` → `preparo_instrucoes` → `preparo_orientacoes_risco` → `preparo_acolhimento` → `exame_tempo_espera` → `exame_empatia_equipe` → `exame_explicacoes` → `exame_seguranca` → `posexame_resultado` → `posexame_cuidados` → `posexame_fluxo_saida` → `avaliacao_geral` → `payload_json`
+
+- Cada resposta preenche **uma coluna por campo**; `respondido_em` é ISO (data/hora).
+- `payload_json` guarda só **perguntas dinâmicas** (IDs que não estão nos cabeçalhos). Se não houver extras, pode ficar vazio.
+- **Migração:** se a aba ainda tinha só `id`, `respondido_em`, `payload_json`, após atualizar o `Code.gs` é preciso **substituir a linha 1** por esta lista (e **reimplantar** o Web App). Linhas antigas com 3 colunas deixam de alinhar; exporte dados antigos se precisar e comece linhas novas ou nova aba.
 6. **Implantar** → **Nova implantação** → tipo **App da Web**:
    - Executar como: você  
    - Quem tem acesso: **Qualquer pessoa** (para o app público enviar POST), a menos que use só o proxy na Vercel com outra estratégia de segurança.

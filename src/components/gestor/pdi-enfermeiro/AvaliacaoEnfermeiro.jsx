@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { db } from "@/api/sheetsClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save, ChevronDown, TrendingUp, TrendingDown } from "lucide-react";
@@ -13,14 +14,21 @@ const ESCALA = {
   4: "Supera Expectativas",
 };
 
-export default function AvaliacaoEnfermeiro() {
+export default function AvaliacaoEnfermeiro({
+  colaboradorInicial: colaboradorInicialProp = "",
+  hideHeaderStats = false,
+  modoEmbutido = false,
+}) {
+  const location = useLocation();
+  const colaboradorInicial = colaboradorInicialProp || (location.state?.colaboradorInicial ?? "");
+
   const queryClient = useQueryClient();
   const [gestorAuth] = useState(() => {
     const auth = localStorage.getItem("gestorAutenticado");
     return auth ? JSON.parse(auth).login : "";
   });
 
-  const [colaborador, setColaborador] = useState("");
+  const [colaborador, setColaborador] = useState(colaboradorInicial);
   const [form, setForm] = useState({
     colaborador_id: "",
     data_avaliacao: new Date().toISOString().split("T")[0],
@@ -41,7 +49,14 @@ export default function AvaliacaoEnfermeiro() {
     "Enfermeira Maria Santos",
     "Enfermeiro Pedro Oliveira",
     "Enfermeira Carla Dias",
+    "Ana Souza",
   ];
+
+  useEffect(() => {
+    if (colaboradorInicial) {
+      setColaborador(colaboradorInicial);
+    }
+  }, [colaboradorInicial]);
 
   const { data: historico = [] } = useQuery({
     queryKey: ["pdi_historico_enfermeiro", colaborador],
@@ -120,6 +135,7 @@ export default function AvaliacaoEnfermeiro() {
       return;
     }
 
+    // @ts-expect-error — payload alinhado a PDIEnfermeiro.create; tipagem genérica do mutate
     saveMutation.mutate(form);
   };
 
@@ -131,7 +147,7 @@ export default function AvaliacaoEnfermeiro() {
 
     const calcMedia = (competencias) => {
       const notas = competencias.filter((c) => c.nota > 0).map((c) => c.nota);
-      return notas.length > 0 ? (notas.reduce((a, b) => a + b) / notas.length).toFixed(1) : 0;
+      return notas.length > 0 ? (notas.reduce((a, b) => a + b) / notas.length).toFixed(1) : "0";
     };
 
     const calcPercentual = (competencias, minimo = 3) => {
@@ -163,7 +179,7 @@ export default function AvaliacaoEnfermeiro() {
 
   return (
     <div className="space-y-6">
-      {stats && (
+      {stats && !hideHeaderStats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
             <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Média Mês Atual</p>
@@ -278,13 +294,17 @@ export default function AvaliacaoEnfermeiro() {
               <select
                 value={colaborador}
                 onChange={(e) => setColaborador(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 bg-white"
+                disabled={modoEmbutido && Boolean(colaboradorInicialProp)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 bg-white disabled:bg-gray-100 disabled:text-gray-700"
               >
                 <option value="">Selecione um colaborador</option>
                 {ENFERMEIROS.map((enf) => (
                   <option key={enf} value={enf}>{enf}</option>
                 ))}
               </select>
+              {modoEmbutido && colaboradorInicialProp && (
+                <p className="text-[10px] text-gray-500 mt-1">Colaborador definido pela lista de PDIs (cadastro único no futuro).</p>
+              )}
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-600 block mb-1.5">Data Avaliação</label>
@@ -351,7 +371,7 @@ export default function AvaliacaoEnfermeiro() {
                         value={avaliacao?.observacoes || ""}
                         onChange={(e) => handleObservacaoChange(comp.id, e.target.value)}
                         placeholder="Observações e exemplos..."
-                        rows="2"
+                        rows={2}
                         className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
                       />
                     </div>
@@ -371,7 +391,7 @@ export default function AvaliacaoEnfermeiro() {
               value={form.pontos_fortes}
               onChange={(e) => setForm({ ...form, pontos_fortes: e.target.value })}
               placeholder="Descreva as fortalezas..."
-              rows="2"
+              rows={2}
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
             />
           </div>
@@ -382,7 +402,7 @@ export default function AvaliacaoEnfermeiro() {
               value={form.pontos_desenvolver}
               onChange={(e) => setForm({ ...form, pontos_desenvolver: e.target.value })}
               placeholder="Competências que precisam melhoria..."
-              rows="2"
+              rows={2}
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
             />
           </div>
@@ -393,7 +413,7 @@ export default function AvaliacaoEnfermeiro() {
               value={form.comentarios}
               onChange={(e) => setForm({ ...form, comentarios: e.target.value })}
               placeholder="Comentários gerais..."
-              rows="2"
+              rows={2}
               className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
             />
           </div>

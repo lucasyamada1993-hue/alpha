@@ -1,11 +1,15 @@
 /**
  * Google Apps Script — backend da planilha (banco de dados).
  *
- * SPREADSHEET_ID = só o ID da planilha (Google Sheets), da URL:
- *   https://docs.google.com/spreadsheets/d/ESTE_ID/edit
- * NÃO é o trecho AKfyc... da URL do Web App (/exec). Esse vai no .env do front.
+ * COMO USAR (obrigatório no Google, não só no Cursor):
+ * 1) Cole este arquivo inteiro em script.google.com (projeto ligado à planilha ou com acesso a ela).
+ * 2) Confira SPREADSHEET_ID abaixo = ID da URL da planilha:
+ *    https://docs.google.com/spreadsheets/d/ESTE_ID/edit
+ *    NÃO use o trecho AKfyc... da URL do Web App (/exec) — esse vai no .env do front (APPS_SCRIPT_WEB_APP_URL).
+ * 3) Na planilha: crie as abas com nomes em TAB e linha 1 = cabeçalhos de SHEET_HEADERS.
+ *    SurveyResponse: uma coluna por campo (ver lista em SHEET_HEADERS e README); sem colunas vazias no fim.
+ * 4) Salvar → Implantar → App da Web → nova versão → copie a URL /exec para .env e Vercel.
  *
- * Depois: abas + linha 1 = SHEET_HEADERS → Implantar → App da Web → URL /exec no VITE_ ou Vercel.
  * Guia: google-apps-script/README.md
  */
 
@@ -97,7 +101,29 @@ var SHEET_HEADERS = {
     "deleted",
     "created_at",
   ],
-  SurveyResponse: ["id", "respondido_em", "payload_json"],
+  SurveyResponse: [
+    "id",
+    "tipo_atendimento",
+    "perfil_respondente",
+    "nps_recomendacao",
+    "comentarios_finais",
+    "respondido_em",
+    "agendamento_claro",
+    "agendamento_informacoes",
+    "agendamento_duvidas",
+    "preparo_instrucoes",
+    "preparo_orientacoes_risco",
+    "preparo_acolhimento",
+    "exame_tempo_espera",
+    "exame_empatia_equipe",
+    "exame_explicacoes",
+    "exame_seguranca",
+    "posexame_resultado",
+    "posexame_cuidados",
+    "posexame_fluxo_saida",
+    "avaliacao_geral",
+    "payload_json",
+  ],
 };
 
 /** Campos armazenados como JSON string na célula */
@@ -151,6 +177,15 @@ function jsonResponse(obj) {
 }
 
 function ss() {
+  if (
+    !SPREADSHEET_ID ||
+    SPREADSHEET_ID.indexOf("COLE_AQUI") !== -1 ||
+    SPREADSHEET_ID.indexOf("PLACEHOLDER") !== -1
+  ) {
+    throw new Error(
+      "Defina SPREADSHEET_ID com o ID real da planilha em Code.gs, salve e implante uma NOVA versão do Web App."
+    );
+  }
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
 
@@ -279,7 +314,8 @@ function updateRow(entity, tabName, headers, id, data) {
   if (headers.indexOf("updated_at") >= 0) merged.updated_at = new Date().toISOString();
 
   var newRow = objectToRow(entity, headers, merged);
-  sh.getRange(rowIndex, 1, rowIndex, headers.length).setValues([newRow]);
+  // Sheet.getRange(row, col, numRows, numColumns) — o 3.º argumento é Nº de linhas, não a última linha.
+  sh.getRange(rowIndex, 1, 1, headers.length).setValues([newRow]);
   return rowToObject(entity, headers, newRow);
 }
 
@@ -322,6 +358,18 @@ function rowToObject(entity, headers, row) {
     }
   }
   if (obj.created_at && obj.created_date === undefined) obj.created_date = obj.created_at;
+
+  if (entity === "SurveyResponse" && obj.payload_json && typeof obj.payload_json === "object") {
+    var pj = obj.payload_json;
+    for (var pk in pj) {
+      if (Object.prototype.hasOwnProperty.call(pj, pk)) {
+        if (obj[pk] === undefined || obj[pk] === null || obj[pk] === "") {
+          obj[pk] = pj[pk];
+        }
+      }
+    }
+  }
+
   return obj;
 }
 

@@ -50,14 +50,19 @@ function StatusBadge({ status, diasRestantes }) {
   };
 
   const labels = {
-    concluido: "✓ Concluído",
-    alerta: `⏰ ${diasRestantes} dias`,
-    atrasado: "🔴 Atrasado",
-    pendente: "⏳ Pendente",
+    concluido: "Concluído",
+    alerta: diasRestantes != null ? `${diasRestantes} d` : "Alerta",
+    atrasado: "Atrasado",
+    pendente: "Pendente",
   };
 
   return (
-    <span className={cn("inline-block px-2 py-1 rounded-md text-xs font-semibold border", map[status])}>
+    <span
+      className={cn(
+        "block w-full max-w-full px-1.5 py-1 rounded-md text-[10px] sm:text-xs font-semibold border text-center leading-tight break-words",
+        map[status]
+      )}
+    >
       {labels[status]}
     </span>
   );
@@ -74,7 +79,7 @@ export default function PDICard() {
         {PROFISSIONAIS.map((prof) => (
           <div key={prof.id} className="px-5 py-4">
             <p className="font-semibold text-gray-800 text-sm mb-3">{prof.nome}</p>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 min-w-0">
               {[
                 { dias: "15D", pdi: prof.pdi15 },
                 { dias: "30D", pdi: prof.pdi30 },
@@ -84,21 +89,23 @@ export default function PDICard() {
                 <div
                   key={idx}
                   className={cn(
-                    "p-3 rounded-lg border-2 text-center",
+                    "min-w-0 flex flex-col items-center gap-1 p-2 sm:p-3 rounded-lg border-2 text-center",
                     item.pdi.status === "concluido" && "bg-emerald-50 border-emerald-300",
                     item.pdi.status === "alerta" && "bg-amber-50 border-amber-300",
                     item.pdi.status === "atrasado" && "bg-red-50 border-red-300",
                     item.pdi.status === "pendente" && "bg-gray-50 border-gray-300"
                   )}
                 >
-                  <div className="flex justify-center mb-1.5">
+                  <div className="flex shrink-0 justify-center">
                     <StatusIcon status={item.pdi.status} />
                   </div>
-                  <p className="text-xs font-bold text-gray-700 mb-1">{item.dias}</p>
-                  <StatusBadge
-                    status={item.pdi.status}
-                    diasRestantes={item.pdi.diasRestantes}
-                  />
+                  <p className="text-xs font-bold text-gray-700 shrink-0">{item.dias}</p>
+                  <div className="w-full min-w-0">
+                    <StatusBadge
+                      status={item.pdi.status}
+                      diasRestantes={item.pdi.diasRestantes}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

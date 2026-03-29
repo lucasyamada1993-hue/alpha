@@ -10,6 +10,7 @@ import {
   GraduationCap,
   TrendingUp,
   AlertTriangle,
+  FileStack,
 } from "lucide-react";
 
 const NAV_GROUPS_MASTER = [
@@ -25,6 +26,7 @@ const NAV_GROUPS_MASTER = [
       { id: "jornada", label: "Jornada do Paciente", icon: UserCheck, path: "/gestor-master/jornada" },
       { id: "equipamentos", label: "Equipamentos & Radioproteção", icon: Wrench, path: "/gestor-master/equipamentos" },
       { id: "qualidade", label: "Qualidade & Não Conformidades", icon: ShieldCheck, path: "/gestor-master/qualidade" },
+      { id: "documentos", label: "Controle de Documentos e POPs", icon: FileStack, path: "/gestor-master/documentos" },
       { id: "lgpd", label: "Segurança & LGPD", icon: Lock, path: "/gestor-master/lgpd" },
     ],
   },
@@ -52,13 +54,14 @@ const NAV_GROUPS_ENFERMAGEM = [
     label: "Principal",
     items: [
       { id: "enfermagem", label: "Gestão Assistencial", icon: LayoutDashboard, path: "/gerente-enfermagem" },
+      { id: "evento-adverso", label: "Eventos adversos & NC", icon: AlertTriangle, path: "/gerente-enfermagem/evento-adverso" },
+      { id: "documentos", label: "POPs — consulta", icon: FileStack, path: "/gerente-enfermagem/documentos" },
     ],
   },
   {
-    label: "Ferramentas",
+    label: "Desenvolvimento & Treinamento",
     items: [
-      { id: "pdi-tecnico", label: "PDI — Técnico de Enfermagem", icon: TrendingUp, path: "/gerente-enfermagem/pdi-tecnico" },
-      { id: "pdi-enfermeiro", label: "PDI — Enfermeiro(a)", icon: TrendingUp, path: "/gerente-enfermagem/pdi-enfermeiro" },
+      { id: "pdi", label: "PDI — Plano de Desenvolvimento", icon: TrendingUp, path: "/gerente-enfermagem/pdi" },
     ],
   },
 ];
@@ -76,6 +79,7 @@ const NAV_GROUPS_QUALIDADE = [
       { id: "jornada-qualidade", label: "Jornada do Paciente", icon: UserCheck, path: "/gestor-qualidade/jornada" },
       { id: "equipamentos", label: "Equipamentos & Radioproteção", icon: Wrench, path: "/gestor-qualidade/equipamentos" },
       { id: "qualidade-nc", label: "Qualidade & Não Conformidades", icon: AlertTriangle, path: "/gestor-qualidade/eventos-nao-conformidades" },
+      { id: "documentos", label: "Controle de Documentos e POPs", icon: FileStack, path: "/gestor-qualidade/documentos" },
     ],
   },
   {

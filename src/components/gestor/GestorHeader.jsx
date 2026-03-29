@@ -9,6 +9,13 @@ const PAGE_TITLES = {
   "treinamentos": "Treinamentos & Competência",
   "melhoria": "Melhoria Contínua",
   "pesquisas": "Gestão de Pesquisas",
+  "carrinho": "Carrinho de Emergências",
+  "enfermagem": "Gestão Assistencial",
+  "pdi": "PDI — Plano de Desenvolvimento Individual",
+  "evento-adverso": "Eventos Adversos & Não Conformidades",
+  "documentos": "Controle de Documentos e POPs",
+  "jornada-qualidade": "Rastreabilidade da Jornada do Paciente",
+  "qualidade-nc": "Qualidade & Não Conformidades",
 };
 
 const PAGE_SUBTITLES = {
@@ -20,6 +27,13 @@ const PAGE_SUBTITLES = {
   "treinamentos": "Matriz de treinamentos, Habilitações e Vencimentos",
   "melhoria": "5 Porquês · Ishikawa · 5W3H · Plano A3",
   "pesquisas": "Gerencie as perguntas exibidas aos pacientes",
+  "carrinho": "Conferência e rastreio de carrinhos de medicamentos",
+  "enfermagem": "Indicadores e fluxos assistenciais",
+  "pdi": "Período de experiência (30/60/90 dias)",
+  "evento-adverso": "Notificação, registro e planos A3 vinculados · assistencial",
+  "documentos": "ONA/ISO · POPs centralizados, versionados e rastreáveis",
+  "jornada-qualidade": "Auditoria ONA · Identificação, Time-out, TAT e Insumos",
+  "qualidade-nc": "Eventos adversos, NC, CAPA e planos de ação",
 };
 
 export default function GestorHeader({ activePage }) {

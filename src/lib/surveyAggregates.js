@@ -6,7 +6,7 @@
 const POSITIVE = new Set(["Ótimo", "Bom"]);
 
 const AGENDAMENTO_KEYS = ["agendamento_claro", "agendamento_informacoes", "agendamento_duvidas"];
-/** Mapeado à etapa Preparo (acolhimento / recepção) */
+/** Mapeado à etapa Cuidado Prévio (acolhimento / recepção) */
 const RECEPCAO_KEYS = ["preparo_instrucoes", "preparo_orientacoes_risco", "preparo_acolhimento"];
 const EQUIPE_KEYS = ["exame_tempo_espera", "exame_empatia_equipe", "exame_explicacoes", "exame_seguranca"];
 

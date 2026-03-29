@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Plus, FileText, ChevronRight, AlertTriangle, Clock, Circle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, FileText, ChevronRight, AlertTriangle, Clock, Circle, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { db } from "@/api/sheetsClient";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import A3CreateModal from "./A3CreateModal";
 
 const PDCA_CONFIG = {
@@ -26,15 +27,33 @@ const TIPO_ICON = {
   "Near Miss": Clock,
 };
 
-export default function A3Lista({ onSelect }) {
+/**
+ * Dono no A3 é texto livre (nome); o login do perfil costuma ser e-mail.
+ * Igualdade ignorando maiúsculas, ou dono contém o login completo, ou (se e-mail) a parte local aparece no nome.
+ */
+function donoAcessivelParaGestor(a, loginRaw) {
+  const dono = (a.dono || "").trim().toLowerCase();
+  const login = (loginRaw || "").trim().toLowerCase();
+  if (!login || !dono) return false;
+  if (dono === login) return true;
+  if (dono.includes(login)) return true;
+  if (login.includes("@")) {
+    const local = login.split("@")[0];
+    if (local.length >= 3 && dono.includes(local)) return true;
+  }
+  return false;
+}
+
+export default function A3Lista({ onSelect, hideNovoButton = false, onNovoA3 }) {
+  const qc = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [gestorAuth, setGestorAuth] = useState(null);
+  const [excluindoId, setExcluindoId] = useState(null);
 
-  // Carrega as informações do gestor autenticado
-  useState(() => {
-    const auth = localStorage.getItem("gestorAutenticado");
-    if (auth) setGestorAuth(JSON.parse(auth));
+  useEffect(() => {
+    const raw = localStorage.getItem("gestorAutenticado");
+    if (raw) setGestorAuth(JSON.parse(raw));
   }, []);
 
   const { data: relatorios = [], refetch } = useQuery({
@@ -42,12 +61,11 @@ export default function A3Lista({ onSelect }) {
     queryFn: async () => {
       const auth = JSON.parse(localStorage.getItem("gestorAutenticado") || "{}");
       const todos = await db.entities.A3Relatorio.filter({ deleted: false }, "-created_date", 50);
-      
-      // Se for Gerente de Enfermagem, filtra apenas A3s onde ele é o dono
+
       if (auth.funcoes?.includes("Gerente Enfermagem")) {
-        return todos.filter(a => a.dono === auth.login);
+        return todos.filter((a) => donoAcessivelParaGestor(a, auth.login));
       }
-      
+
       return todos;
     },
   });
@@ -55,6 +73,30 @@ export default function A3Lista({ onSelect }) {
   const filtrados = filtroStatus === "todos"
     ? relatorios
     : relatorios.filter((r) => r.status_pdca === filtroStatus);
+
+  const handleExcluir = async (e, r) => {
+    e.stopPropagation();
+    if (!r?.id) return;
+    if (!window.confirm(`Arquivar o A3 "${r.titulo || r.id}"? O registo deixa de aparecer na lista (soft delete).`)) return;
+    setExcluindoId(r.id);
+    try {
+      await db.entities.A3Relatorio.update(r.id, {
+        ...r,
+        deleted: true,
+        deleted_by: "Usuário",
+        deleted_at: new Date().toISOString(),
+        updated_by: "Usuário",
+      });
+      await qc.invalidateQueries({ queryKey: ["a3relatorios"] });
+      refetch();
+      toast.success("A3 arquivado.");
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Erro ao arquivar o A3.");
+    } finally {
+      setExcluindoId(null);
+    }
+  };
 
   const estatisticas = {
     total: relatorios.length,
@@ -97,7 +139,7 @@ export default function A3Lista({ onSelect }) {
           <div className="text-xs text-gray-500 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
             Visualização: Apenas seus A3s
           </div>
-        ) : (
+        ) : hideNovoButton ? null : (
           <button
             onClick={() => setShowCreate(true)}
             className="flex items-center gap-2 bg-[#0D47A1] hover:bg-[#0B3D91] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm shadow-blue-200"
@@ -112,7 +154,16 @@ export default function A3Lista({ onSelect }) {
         <div className="bg-white rounded-xl border border-dashed border-gray-200 p-12 text-center">
           <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
           <p className="text-sm font-medium text-gray-400">Nenhum relatório A3 encontrado.</p>
-          <p className="text-xs text-gray-300 mt-1">Clique em "Novo A3" para começar.</p>
+          <p className="text-xs text-gray-300 mt-1">Clique em &quot;Novo A3&quot; para começar.</p>
+          {onNovoA3 && (
+            <button
+              type="button"
+              onClick={onNovoA3}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#0D47A1] text-white rounded-lg hover:bg-[#0B3D91] font-semibold text-sm transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Novo A3
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-2">
@@ -161,10 +212,19 @@ export default function A3Lista({ onSelect }) {
                     </div>
                   </div>
 
-                  {/* Status + Prioridade */}
+                  {/* Status + Prioridade + Excluir */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full border", PRIORIDADE_COLOR[r.prioridade])}>{r.prioridade}</span>
                     <span className={cn("text-xs font-bold px-3 py-1 rounded-full border tracking-wider", pdca.color)}>{pdca.label}</span>
+                    <button
+                      type="button"
+                      title="Arquivar A3"
+                      onClick={(e) => handleExcluir(e, r)}
+                      disabled={excluindoId === r.id}
+                      className="p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
+                    >
+                      {excluindoId === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    </button>
                     <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors" />
                   </div>
                 </div>

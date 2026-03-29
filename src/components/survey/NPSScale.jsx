@@ -14,7 +14,7 @@ export default function NPSScale({ value, onChange, error }) {
         "text-lg font-semibold text-center",
         error && "text-destructive"
       )}>
-        Em uma escala de 0 a 10, o quanto você recomendaria nosso serviço?
+        O quanto você confiaria em recomendar a Alphasonic para amigos e familiares?
         {error && <span className="text-destructive text-sm ml-2">*</span>}
       </p>
       <div className="flex justify-center">
@@ -42,8 +42,8 @@ export default function NPSScale({ value, onChange, error }) {
         </div>
       </div>
       <div className="flex justify-between text-xs text-muted-foreground max-w-lg mx-auto px-1">
-        <span>Nada provável</span>
-        <span>Muito provável</span>
+        <span>Não recomendaria</span>
+        <span>Com toda certeza!</span>
       </div>
       {value !== null && value !== undefined && (
         <motion.div

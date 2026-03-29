@@ -15,63 +15,108 @@ export const PERFIL_ICONS = [User, Users, HelpCircle];
 export const STEPS = [
   {
     id: "inicio",
-    title: "Identificação",
+    title: "Boas-Vindas",
     subtitle: "Conte-nos sobre você e o atendimento",
     fields: ["tipo_atendimento", "perfil_respondente"],
   },
   {
     id: "agendamento",
-    title: "Agendamento",
-    subtitle: "Avalie o processo de agendamento",
+    title: "Primeiro Contato",
+    subtitle: "Queremos saber se você se sentiu acolhido desde o início",
     questions: [
-      { field: "agendamento_claro", question: "O agendamento foi claro e objetivo?" },
-      { field: "agendamento_informacoes", question: "As informações sobre data, horário e local foram adequadas?" },
-      { field: "agendamento_duvidas", question: "Suas dúvidas foram esclarecidas durante o agendamento?" },
+      { field: "agendamento_claro", question: "Sentiu que o agendamento foi simples e tranquilo para você?" },
+      {
+        field: "agendamento_informacoes",
+        question: "Sente que as orientações de dia e lugar foram passadas com todo o cuidado?",
+      },
+      {
+        field: "agendamento_duvidas",
+        question: "Sentiu que suas dúvidas foram ouvidas e respondidas com atenção?",
+      },
     ],
   },
   {
     id: "preparo",
-    title: "Preparo",
-    subtitle: "Avalie as orientações de preparo",
+    title: "Cuidado Prévio",
+    subtitle: "Queremos saber se você se sentiu bem cuidado antes mesmo do seu exame",
     questions: [
-      { field: "preparo_instrucoes", question: "As instruções de preparo foram claras e compreensíveis?" },
-      { field: "preparo_orientacoes_risco", question: "Você recebeu orientações sobre riscos e contraindicações?" },
-      { field: "preparo_acolhimento", question: "Como foi o acolhimento da equipe ao recebê-lo(a)?" },
+      {
+        field: "preparo_instrucoes",
+        question: "Nossas orientações de preparo foram simples e fáceis de seguir?",
+      },
+      {
+        field: "preparo_orientacoes_risco",
+        question:
+          "Nossa equipe teve o cuidado de explicar tudo o que você precisava saber sobre o seu procedimento?",
+      },
+      {
+        field: "preparo_acolhimento",
+        question: "Como você se sentiu ao ser recebido(a) por nossa equipe?",
+      },
     ],
   },
   {
     id: "exame",
-    title: "Realização do Exame",
-    subtitle: "Avalie a experiência durante o exame",
+    title: "Sua Jornada Conosco",
+    subtitle: "Nosso compromisso é fazer você se sentir bem em cada segundo aqui.",
     questions: [
-      { field: "exame_tempo_espera", question: "Como você avalia o tempo de espera até o atendimento?" },
-      { field: "exame_empatia_equipe", question: "A equipe foi empática e atenciosa durante o exame?" },
-      { field: "exame_explicacoes", question: "Os procedimentos foram explicados de forma clara?" },
-      { field: "exame_seguranca", question: "Você se sentiu seguro(a) durante o exame?" },
+      {
+        field: "exame_tempo_espera",
+        question: "Como você sentiu o tempo em nossa recepção antes de ser chamado(a)?",
+      },
+      {
+        field: "exame_empatia_equipe",
+        question: "Nossa equipe tratou você com o acolhimento e empatia?",
+      },
+      {
+        field: "exame_explicacoes",
+        question: "Nossos profissionais explicaram cada passo do exame com paciência e clareza?",
+      },
+      {
+        field: "exame_seguranca",
+        question: "Em algum momento você deixou de se sentir seguro(a) e amparado(a) por nós?",
+      },
     ],
   },
   {
     id: "posexame",
-    title: "Pós-Exame",
-    subtitle: "Avalie o atendimento após o exame",
+    title: "Até Logo",
+    subtitle: "Nosso cuidado acompanha você até a sua volta para casa.",
     questions: [
-      { field: "posexame_resultado", question: "A orientação sobre a entrega do resultado foi clara?" },
-      { field: "posexame_cuidados", question: "Recebeu orientações sobre cuidados pós-exame?" },
-      { field: "posexame_fluxo_saida", question: "O fluxo de saída foi organizado e eficiente?" },
+      {
+        field: "posexame_resultado",
+        question: "Você se sente tranquilo(a) sobre como e quando receberá seus resultados?",
+      },
+      {
+        field: "posexame_cuidados",
+        question: "Ficou claro como você deve se cuidar após o procedimento de hoje?",
+      },
+      {
+        field: "posexame_fluxo_saida",
+        question: "O encerramento do seu atendimento foi prático e atencioso?",
+      },
     ],
   },
   {
     id: "avaliacao",
-    title: "Avaliação Geral",
-    subtitle: "Avaliação final e recomendação",
+    title: "Seu Olhar sobre Nós",
+    subtitle: "Sua percepção completa é o que nos ajuda a cuidar melhor.",
     questions: [
-      { field: "avaliacao_geral", question: "Como você avalia a experiência geral no SADT?" },
+      {
+        field: "avaliacao_geral",
+        question: "De forma geral, como você avalia sua experiência na Alphasonic?",
+      },
     ],
   },
   {
     id: "nps",
-    title: "Recomendação & Comentários",
+    title: "Fim da jornada",
     subtitle: "Nota final e espaço para sugestões",
     fields: ["nps_recomendacao", "comentarios_finais"],
   },
 ];
+
+/** Subtítulo por categoria (etapas com perguntas) — usado na pesquisa dinâmica */
+export const RATING_SUBTITLE_BY_CATEGORY = Object.fromEntries(
+  STEPS.filter((s) => s.questions?.length).map((s) => [s.title, s.subtitle])
+);

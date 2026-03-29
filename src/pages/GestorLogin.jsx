@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, Activity } from "lucide-react";
+import { Lock } from "lucide-react";
 import { toast } from "sonner";
 import { db } from "@/api/sheetsClient";
+import BrandingFachadaColumn from "@/components/BrandingFachadaColumn";
+import LogoCxCorner from "@/components/LogoCxCorner";
+
+/** Acesso mestre ao painel /gestor-master (também útil se a aba GestorPerfil ainda não existir na planilha). */
+const LOGIN_MASTER = "Gestaoalpha";
+const SENHA_MASTER = "adm123";
 
 export default function GestorLogin() {
   const navigate = useNavigate();
@@ -20,26 +26,52 @@ export default function GestorLogin() {
 
     setLoading(true);
 
-    const perfis = await db.entities.GestorPerfil.filter({
-      login: login,
-      ativo: true,
-    });
+    let perfis = [];
+    try {
+      perfis = await db.entities.GestorPerfil.filter({
+        login: login.trim(),
+        ativo: true,
+      });
+    } catch {
+      perfis = [];
+    }
 
-    if (perfis.length > 0 && perfis[0].senha === senha) {
-      localStorage.setItem("gestorAutenticado", JSON.stringify({
-        login: perfis[0].login,
-        funcoes: perfis[0].funcoes,
-        timestamp: new Date().toISOString(),
-      }));
+    const loginNorm = login.trim().toLowerCase();
+    const sheetOk =
+      perfis.length > 0 && String(perfis[0].senha) === senha;
+
+    const masterOk =
+      loginNorm === LOGIN_MASTER.toLowerCase() && senha === SENHA_MASTER;
+
+    if (sheetOk) {
+      localStorage.setItem(
+        "gestorAutenticado",
+        JSON.stringify({
+          login: perfis[0].login,
+          funcoes: perfis[0].funcoes,
+          timestamp: new Date().toISOString(),
+        })
+      );
       toast.success("Login realizado com sucesso!");
       setTimeout(() => {
-        const userFunctions = perfis[0].funcoes;
+        const userFunctions = perfis[0].funcoes || [];
         if (userFunctions.includes("Gerente Enfermagem")) {
           navigate("/gerente-enfermagem");
         } else {
           navigate("/gestor-master");
         }
       }, 300);
+    } else if (masterOk) {
+      localStorage.setItem(
+        "gestorAutenticado",
+        JSON.stringify({
+          login: LOGIN_MASTER,
+          funcoes: ["Gestor Master"],
+          timestamp: new Date().toISOString(),
+        })
+      );
+      toast.success("Login realizado com sucesso!");
+      setTimeout(() => navigate("/gestor-master"), 300);
     } else {
       toast.error("Login ou senha incorretos");
       setSenha("");
@@ -50,36 +82,17 @@ export default function GestorLogin() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Coluna Esquerda */}
-      <div className="relative flex flex-col justify-between md:w-1/2 min-h-[45vh] md:min-h-screen bg-gradient-to-br from-[#0d47a1] via-[#1565C0] to-[#0a3d91]">
-        <div className="absolute inset-0 bg-[#0D47A1]/20" />
-
-        <div className="relative z-10 p-8" />
-
-        <div className="relative z-10 flex-1 flex items-center justify-center px-10 py-8">
-          <h1 className="text-white font-extrabold text-3xl md:text-4xl lg:text-5xl text-center leading-tight">
-            Painel de Gestão Alphasonic
-          </h1>
-        </div>
-
-        <div className="relative z-10 p-8 hidden md:block" />
-      </div>
+      <BrandingFachadaColumn>
+        <h1 className="text-center text-3xl font-extrabold leading-tight text-white md:text-4xl lg:text-5xl [text-shadow:0_2px_20px_rgba(0,0,0,0.85),0_1px_4px_rgba(0,0,0,0.95)]">
+          Painel de Gestão Alphasonic
+        </h1>
+      </BrandingFachadaColumn>
 
       {/* Coluna Direita */}
-      <div className="relative flex flex-col md:w-1/2 bg-white">
-        <div className="flex-1 flex flex-col items-center justify-center px-8 py-14 md:py-0">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-[#0D47A1] flex items-center justify-center">
-              <Activity className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="font-bold text-gray-800 text-lg">Alphasonic</p>
-              <p className="text-xs text-gray-400 uppercase tracking-wider">Gestor</p>
-            </div>
-          </div>
-
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-2">
+      <div className="relative flex flex-col bg-white md:w-1/2">
+        <LogoCxCorner />
+        <div className="flex flex-1 flex-col items-center justify-center px-8 pb-10 pt-16 md:py-0">
+          <h2 className="mb-2 text-center text-3xl font-bold text-gray-800 md:text-4xl">
             Acesso do Gestor
           </h2>
           <p className="text-gray-500 text-center text-sm mb-8 max-w-xs">

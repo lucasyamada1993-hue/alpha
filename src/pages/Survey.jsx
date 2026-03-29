@@ -13,7 +13,19 @@ import StepIdentificacao from "@/components/survey/StepIdentificacao";
 import StepRatings from "@/components/survey/StepRatings";
 import StepNPS from "@/components/survey/StepNPS";
 import { useSurveyStore } from "@/lib/surveyStore";
+import { STEPS, RATING_SUBTITLE_BY_CATEGORY } from "@/lib/surveyConfig";
 import { SURVEY_DASHBOARD_QUERY_KEY } from "@/hooks/useSurveyDashboardMetrics";
+
+const STEP_INICIO = STEPS.find((s) => s.id === "inicio");
+const STEP_NPS = STEPS.find((s) => s.id === "nps");
+
+function getRequiredFieldsForStep(step) {
+  if (!step) return [];
+  if (step.type === "identificacao") return ["tipo_atendimento", "perfil_respondente"];
+  if (step.type === "nps") return ["nps_recomendacao"];
+  if (step.type === "ratings") return step.questions.map((q) => q.field);
+  return [];
+}
 
 export default function Survey() {
   const navigate = useNavigate();
@@ -41,22 +53,22 @@ export default function Survey() {
     const dynamicSteps = [
       {
         id: "inicio",
-        title: "Identificação",
-        subtitle: "Conte-nos sobre você e o atendimento",
+        title: STEP_INICIO?.title ?? "Boas-Vindas",
+        subtitle: STEP_INICIO?.subtitle ?? "Conte-nos sobre você e o atendimento",
         type: "identificacao",
         fields: ["tipo_atendimento", "perfil_respondente"],
       },
       ...categorias.map((cat) => ({
         id: cat,
         title: cat,
-        subtitle: `Avalie ${cat.toLowerCase()}`,
+        subtitle: RATING_SUBTITLE_BY_CATEGORY[cat] ?? `Avalie ${cat.toLowerCase()}`,
         type: "ratings",
         questions: grouped[cat].map((p) => ({ field: p.id, question: p.pergunta })),
       })),
       {
         id: "nps",
-        title: "Recomendação & Comentários",
-        subtitle: "Nota final e espaço para sugestões",
+        title: STEP_NPS?.title ?? "Fim da jornada",
+        subtitle: STEP_NPS?.subtitle ?? "Nota final e espaço para sugestões",
         type: "nps",
         fields: ["nps_recomendacao", "comentarios_finais"],
       },
@@ -70,14 +82,7 @@ export default function Survey() {
     setErrors((prev) => ({ ...prev, [field]: false }));
   };
 
-  const getStepRequiredFields = (stepIndex) => {
-    const step = steps[stepIndex];
-    if (!step) return [];
-    if (step.type === "identificacao") return ["tipo_atendimento", "perfil_respondente"];
-    if (step.type === "nps") return ["nps_recomendacao"];
-    if (step.type === "ratings") return step.questions.map((q) => q.field);
-    return [];
-  };
+  const getStepRequiredFields = (stepIndex) => getRequiredFieldsForStep(steps[stepIndex]);
 
   const validateCurrentStep = () => {
     const fields = getStepRequiredFields(currentStep);
@@ -108,13 +113,7 @@ export default function Survey() {
   const handleSubmit = async () => {
     if (!validateCurrentStep()) return;
 
-    // Valida todos os campos de todos os steps
-    const allRequired = steps.flatMap((s) => {
-      if (s.type === "identificacao") return ["tipo_atendimento", "perfil_respondente"];
-      if (s.type === "nps") return ["nps_recomendacao"];
-      if (s.type === "ratings") return s.questions.map((q) => q.field);
-      return [];
-    });
+    const allRequired = steps.flatMap(getRequiredFieldsForStep);
 
     const allErrors = {};
     let valid = true;
@@ -133,12 +132,22 @@ export default function Survey() {
     }
 
     setSubmitting(true);
-    const payload = { ...data };
-    if (!payload.comentarios_finais) payload.comentarios_finais = "";
-    await db.entities.SurveyResponse.create(payload);
-    queryClient.invalidateQueries({ queryKey: SURVEY_DASHBOARD_QUERY_KEY });
-    toast.success("Pesquisa registrada com sucesso!");
-    navigate("/obrigado");
+    try {
+      const payload = { ...data };
+      if (!payload.comentarios_finais) payload.comentarios_finais = "";
+      await db.entities.SurveyResponse.create(payload);
+      queryClient.invalidateQueries({ queryKey: SURVEY_DASHBOARD_QUERY_KEY });
+      toast.success("Pesquisa registrada com sucesso!");
+      navigate("/obrigado");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(
+        msg ||
+          "Não foi possível enviar a pesquisa. Verifique a conexão e a configuração da API (planilha)."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!steps.length) return null;
