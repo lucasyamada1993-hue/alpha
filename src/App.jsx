@@ -1,10 +1,11 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import HomePortal from './pages/HomePortal';
 import Welcome from './pages/Welcome';
 import Survey from './pages/Survey';
 import ThankYou from './pages/ThankYou';
@@ -53,7 +54,7 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/pesquisa-inicial" replace />} />
+      <Route path="/" element={<HomePortal />} />
       <Route path="/pesquisa-inicial" element={<Welcome />} />
       <Route path="/pesquisa" element={<Survey />} />
       <Route path="/obrigado" element={<ThankYou />} />
